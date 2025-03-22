@@ -5,47 +5,171 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Movie Tracker</title>
   <style>
-    body { font-family: Arial, sans-serif; text-align: center; margin: 20px; }
-    table { width: 50%; margin: 20px auto; border-collapse: collapse; }
-    th, td { border: 1px solid black; padding: 8px; text-align: left; }
-    th { background-color: #f2f2f2; }
-    input { width: 100%; border: none; text-align: center; }
-    .progress-container { width: 50%; margin: 20px auto; background-color: #ddd; border-radius: 10px; overflow: hidden; }
-    .progress-bar { height: 20px; width: 0%; background-color: #D61F1F; transition: width 0.5s; }
-    #summary { margin-top: 20px; }
+    /* Set background image with very light darkening */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background: url('tracker.jpg') no-repeat center center/cover;
+      position: relative;
+      min-height: 100vh;
+      color: #fff;
+      overflow-x: hidden;
+    }
+    body::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.1); /* very light darkening */
+      z-index: 0;
+    }
+    /* Upper section: contains table and progress bar in top third */
+    .upper-section {
+      position: relative;
+      z-index: 1;
+      padding: 20px;
+      height: 33%;
+    }
+    table {
+      width: 50%;
+      margin: 0 auto;
+      border-collapse: collapse;
+      background: rgba(255, 255, 255, 0.9);
+      color: #000;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: center;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    input {
+      width: 100%;
+      border: none;
+      text-align: center;
+      background: transparent;
+    }
+    .progress-container {
+      width: 50%;
+      margin: 10px auto;
+      background-color: #ddd;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .progress-bar {
+      height: 20px;
+      width: 0%;
+      background-color: #D61F1F;
+      transition: width 0.5s;
+    }
+    /* Lower section: positioned at bottom third */
+    .lower-section {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      right: 20px;
+      z-index: 1;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+    /* Left summary block (TOTAL WATCHED) */
+    .left-summary {
+      /* width can adjust automatically */
+      text-align: left;
+    }
+    .left-summary .summary-block {
+      /* Ensuring the block width stretches from the start of TOTAL to the end of the number */
+      display: inline-block;
+    }
+    /* Right summary blocks (MOVIES LEFT and MOVIES PER DAY) */
+    .right-summary {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 20px;
+    }
+    .summary-block {
+      line-height: 1.2;
+    }
+    .label {
+      font-size: 1rem;
+      color: #aaa;
+    }
+    .number {
+      font-size: 2rem;
+      color: #fff;
+    }
+    .sub-label {
+      font-size: 1rem;
+      color: #aaa;
+    }
   </style>
 </head>
 <body>
-  <h1>Movie Tracker</h1>
-  <table>
-    <thead>
-      <tr>
-        <th>Month</th>
-        <th>Movies Watched</th>
-      </tr>
-    </thead>
-    <tbody id="movieTable"></tbody>
-  </table>
-  <div class="progress-container">
-    <div class="progress-bar" id="progressBar"></div>
-  </div>
-  <p id="summary"></p>
-
+  <!-- Check for authentication: if sessionStorage flag is missing, redirect to password page -->
   <script>
-    // If the session flag isn't present, force the user to enter the password
     if (sessionStorage.getItem('passwordEntered') !== 'true') {
       window.location.href = 'password.html';
     }
-    // Clear the session flag when the user leaves or refreshes the page
+    // Clear flag on refresh/leave so that password is required every new visit.
     window.addEventListener('beforeunload', function() {
       sessionStorage.removeItem('passwordEntered');
     });
+  </script>
 
-    // Movie Tracker code:
+  <!-- Upper Section: Table and Progress Bar -->
+  <div class="upper-section">
+    <table>
+      <thead>
+        <tr>
+          <th>Month</th>
+          <th>Movies Watched</th>
+        </tr>
+      </thead>
+      <tbody id="movieTable"></tbody>
+    </table>
+    <div class="progress-container">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+  </div>
+
+  <!-- Lower Section: Summary Information -->
+  <div class="lower-section">
+    <!-- Lower Left: TOTAL WATCHED -->
+    <div class="left-summary">
+      <div class="summary-block">
+        <div class="label">TOTAL</div>
+        <div class="number" id="totalNumber">0</div>
+        <div class="sub-label">WATCHED</div>
+      </div>
+    </div>
+    <!-- Lower Right: MOVIES LEFT and MOVIES PER DAY -->
+    <div class="right-summary">
+      <div class="summary-block">
+        <div class="label">MOVIES</div>
+        <div class="number" id="moviesLeftNumber">0</div>
+        <div class="sub-label">LEFT</div>
+      </div>
+      <div class="summary-block">
+        <div class="label">MOVIES</div>
+        <div class="number" id="moviesPerDayNumber">0</div>
+        <div class="sub-label">PER DAY</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Tracker configuration and table creation
     const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
     const currentMonthIndex = new Date().getMonth();
     const goalPerMonth = 20;
-
+    
     function createTable() {
       let tableBody = document.getElementById("movieTable");
       tableBody.innerHTML = "";
@@ -73,7 +197,7 @@
       }
       updateSummary();
     }
-
+    
     function updateSummary() {
       let totalWatched = 0;
       document.querySelectorAll("tbody input").forEach(input => {
@@ -86,14 +210,16 @@
       let daysLeft = new Date(new Date().getFullYear(), currentMonthIndex + 1, 0).getDate() - new Date().getDate();
       let moviesPerDay = (moviesDifference > 0 && daysLeft > 0) ? (moviesDifference / daysLeft).toFixed(2) : 0;
       
-      let summaryText = `Total watched: ${totalWatched} <br>`;
-      summaryText += (moviesDifference > 0) ? `Movies to reach goal: ${moviesDifference} <br>` : `Movies ahead of goal: ${Math.abs(moviesDifference)} <br>`;
-      summaryText += `Movies per day needed: ${moviesPerDay}`;
+      // Update the lower summary values
+      document.getElementById("totalNumber").textContent = totalWatched;
+      // If behind goal, movies left will be positive; if ahead, show zero (as per previous logic)
+      let moviesLeft = moviesDifference > 0 ? moviesDifference : 0;
+      document.getElementById("moviesLeftNumber").textContent = moviesLeft;
+      document.getElementById("moviesPerDayNumber").textContent = moviesPerDay;
       
-      document.getElementById("summary").innerHTML = summaryText;
       updateProgressBar(totalWatched, minExpected, expectedTotal);
     }
-
+    
     function updateProgressBar(watched, minGoal, maxGoal) {
       let progress = Math.min((watched / maxGoal) * 100, 100);
       let progressBar = document.getElementById("progressBar");
@@ -107,7 +233,7 @@
         progressBar.style.backgroundColor = "#006B3D";
       }
     }
-
+    
     createTable();
   </script>
 </body>
