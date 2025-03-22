@@ -5,11 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Movie Tracker</title>
   <style>
-    /* Global: white text with black stroke for outline */
-    * {
-      color: white;
-      -webkit-text-stroke: 1px black;
-    }
+    /* Background setup with tracker.jpg and light dark overlay */
     body {
       margin: 0;
       padding: 0;
@@ -17,64 +13,62 @@
       background: url('tracker.jpg') no-repeat center center/cover;
       position: relative;
       min-height: 100vh;
+      color: #fff;
       overflow-x: hidden;
     }
     body::after {
-      content: "";
+      content: '';
       position: absolute;
-      top:0; left:0;
+      top: 0; left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0,0,0,0.1); /* very light darkening */
+      background: rgba(0, 0, 0, 0.1); /* very light darkening */
       z-index: 0;
     }
-    /* Upper section: table and progress bar in top third */
+    /* Upper Section: Table & Progress Bar (top third) */
     .upper-section {
       position: relative;
       z-index: 1;
-      padding: 40px 20px 20px;
+      padding: 20px;
       height: 33%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
     }
-    /* Table styling: no background, black outline, thicker borders, larger text */
     table {
-      width: 60%;
+      width: 50%;
       margin: 0 auto;
       border-collapse: collapse;
-      background: transparent;
-      border: 3px solid black;
-      font-size: 2rem; /* Larger text */
+      background: rgba(255, 255, 255, 0.9);
+      color: #000;
+      border-radius: 4px;
+      overflow: hidden;
     }
     th, td {
-      border: 3px solid black;
-      padding: 12px;
+      border: 1px solid #ccc;
+      padding: 8px;
       text-align: center;
+    }
+    th {
+      background-color: #f2f2f2;
     }
     input {
       width: 100%;
       border: none;
       text-align: center;
       background: transparent;
-      font-size: 2rem;
     }
-    /* Progress container: increased spacing below the table */
     .progress-container {
-      width: 60%;
-      margin: 30px auto 0;
-      background-color: transparent;
-      border: 3px solid black;
+      width: 50%;
+      margin: 10px auto;
+      background-color: #ddd;
       border-radius: 10px;
       overflow: hidden;
     }
     .progress-bar {
-      height: 25px;
+      height: 20px;
       width: 0%;
       background-color: #D61F1F;
       transition: width 0.5s;
     }
-    /* Lower section: occupies bottom third; use a grid for three categories */
+    /* Lower Section: Positioned in bottom third, using a grid layout */
     .lower-section {
       position: absolute;
       bottom: 20px;
@@ -85,9 +79,10 @@
       grid-template-columns: 1fr 1fr;
       grid-template-rows: 1fr 1fr;
       gap: 20px;
+      /* Adjust height as needed */
       height: 30%;
     }
-    /* Left summary spans both rows */
+    /* Left cell spanning both rows for TOTAL WATCHED */
     .left-summary {
       grid-column: 1 / 2;
       grid-row: 1 / span 2;
@@ -96,52 +91,59 @@
       justify-content: center;
       align-items: center;
     }
-    /* Right column: two separate categories */
+    /* Right column, each cell for one category */
     .right-summary {
       grid-column: 2 / 3;
       display: flex;
       flex-direction: column;
       gap: 20px;
+    }
+    .category {
+      display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
-    }
-    /* Category blocks: the first row (label and number) and second row (sub-label) must span the full width */
-    .category {
       width: 100%;
-      text-align: center;
     }
+    /* First row: label and number side-by-side */
     .first-row {
-      font-size: 5rem;  /* 500% larger */
+      font-size: 1.5rem;
       display: flex;
-      justify-content: center;
       align-items: baseline;
     }
     .first-row .number {
-      margin-left: 10px;
-      font-size: 6rem; /* even larger for numbers */
+      margin-left: 5px;
+      font-size: 2rem;
+      color: #fff;
     }
+    /* Second row: sub-label stretched to match the width of the first row */
     .second-row {
-      font-size: 4rem;
       width: 100%;
-      border-top: 3px solid black; /* Underline stretching full width */
-      margin-top: 10px;
-      padding-top: 5px;
+      font-size: 1rem;
+      text-align: center;
+      margin-top: 5px;
+    }
+    /* Center the content within each lower cell */
+    .left-summary .category,
+    .right-summary .category {
+      width: 100%;
     }
   </style>
 </head>
 <body>
-  <!-- Authentication check: if no session flag, redirect to password page -->
+  <!-- Authentication Check -->
   <script>
+    // Redirect to password page if session flag not set
     if (sessionStorage.getItem('passwordEntered') !== 'true') {
       window.location.href = 'password.html';
     }
-    // Clear session flag on unload so a refresh requires password entry.
+    // Clear flag on refresh/leave so password is required every new visit.
     window.addEventListener('beforeunload', function() {
       sessionStorage.removeItem('passwordEntered');
     });
   </script>
-  
-  <!-- Upper Section: Table and Progress Bar -->
+
+  <!-- Upper Section -->
   <div class="upper-section">
     <table>
       <thead>
@@ -156,10 +158,10 @@
       <div class="progress-bar" id="progressBar"></div>
     </div>
   </div>
-  
-  <!-- Lower Section: Categories -->
+
+  <!-- Lower Section -->
   <div class="lower-section">
-    <!-- Left cell: TOTAL WATCHED spanning both rows -->
+    <!-- Left Cell: TOTAL WATCHED (spanning both rows) -->
     <div class="left-summary">
       <div class="category">
         <div class="first-row">
@@ -170,7 +172,7 @@
         </div>
       </div>
     </div>
-    <!-- Right column: two separate categories -->
+    <!-- Right Column: Two cells for MOVIES LEFT and MOVIES PER DAY -->
     <div class="right-summary">
       <div class="category" id="moviesLeftCategory">
         <div class="first-row">
@@ -190,7 +192,7 @@
       </div>
     </div>
   </div>
-  
+
   <!-- Tracker Script -->
   <script>
     const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -198,18 +200,18 @@
     const goalPerMonth = 20;
     
     function createTable() {
-      const tableBody = document.getElementById("movieTable");
+      let tableBody = document.getElementById("movieTable");
       tableBody.innerHTML = "";
       
       for (let i = 0; i <= currentMonthIndex; i++) {
-        const row = document.createElement("tr");
+        let row = document.createElement("tr");
         
-        const monthCell = document.createElement("td");
+        let monthCell = document.createElement("td");
         monthCell.textContent = months[i];
         row.appendChild(monthCell);
         
-        const moviesCell = document.createElement("td");
-        const input = document.createElement("input");
+        let moviesCell = document.createElement("td");
+        let input = document.createElement("input");
         input.type = "number";
         input.min = "0";
         input.value = localStorage.getItem(months[i]) || "0";
@@ -231,14 +233,16 @@
         totalWatched += parseInt(input.value) || 0;
       });
       
-      const minExpected = currentMonthIndex * goalPerMonth;
-      const expectedTotal = (currentMonthIndex + 1) * goalPerMonth;
-      const moviesDifference = expectedTotal - totalWatched;
-      const daysLeft = new Date(new Date().getFullYear(), currentMonthIndex + 1, 0).getDate() - new Date().getDate();
-      const moviesPerDay = (moviesDifference > 0 && daysLeft > 0) ? (moviesDifference / daysLeft).toFixed(2) : 0;
+      let minExpected = currentMonthIndex * goalPerMonth;
+      let expectedTotal = (currentMonthIndex + 1) * goalPerMonth;
+      let moviesDifference = expectedTotal - totalWatched;
+      let daysLeft = new Date(new Date().getFullYear(), currentMonthIndex + 1, 0).getDate() - new Date().getDate();
+      let moviesPerDay = (moviesDifference > 0 && daysLeft > 0) ? (moviesDifference / daysLeft).toFixed(2) : 0;
       
+      // Update lower summary values
       document.getElementById("totalNumber").textContent = totalWatched;
-      const moviesLeft = moviesDifference > 0 ? moviesDifference : 0;
+      // For MOVIES LEFT, show a positive value only when behind goal (else 0)
+      let moviesLeft = moviesDifference > 0 ? moviesDifference : 0;
       document.getElementById("moviesLeftNumber").textContent = moviesLeft;
       document.getElementById("moviesPerDayNumber").textContent = moviesPerDay;
       
@@ -246,8 +250,8 @@
     }
     
     function updateProgressBar(watched, minGoal, maxGoal) {
-      const progress = Math.min((watched / maxGoal) * 100, 100);
-      const progressBar = document.getElementById("progressBar");
+      let progress = Math.min((watched / maxGoal) * 100, 100);
+      let progressBar = document.getElementById("progressBar");
       progressBar.style.width = progress + "%";
       
       if (watched < minGoal) {
