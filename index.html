@@ -49,11 +49,22 @@
                 let input = document.createElement("input");
                 input.type = "number";
                 input.min = "0";
-                input.value = localStorage.getItem(months[i]) || "0";
-                input.addEventListener("input", updateSummary);
-                input.addEventListener("change", function() {
-                    localStorage.setItem(months[i], input.value);
-                });
+                
+                // For January and February, set fixed values and disable input
+                if (i === 0) {
+                    input.value = "18";
+                    input.disabled = true; // Disable input for January
+                } else if (i === 1) {
+                    input.value = "19";
+                    input.disabled = true; // Disable input for February
+                } else {
+                    input.value = localStorage.getItem(months[i]) || "0";
+                    input.addEventListener("input", updateSummary);
+                    input.addEventListener("change", function() {
+                        localStorage.setItem(months[i], input.value);
+                    });
+                }
+                
                 moviesCell.appendChild(input);
                 row.appendChild(moviesCell);
                 
