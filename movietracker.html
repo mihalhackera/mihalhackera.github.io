@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Movie Tracker</title>
   <style>
-    /* Background setup with tracker.jpg and light dark overlay */
+    /* Background using tracker.jpg with a very light dark overlay */
     body {
       margin: 0;
       padding: 0;
@@ -25,40 +25,45 @@
       background: rgba(0, 0, 0, 0.1); /* very light darkening */
       z-index: 0;
     }
-    /* Upper Section: Table & Progress Bar (top third) */
+    /* Upper Section: Table & Progress Bar in top third (brought further down) */
     .upper-section {
       position: relative;
       z-index: 1;
-      padding: 20px;
+      padding: 40px 20px 20px;  /* More top padding to bring content down */
       height: 33%;
     }
+    /* Transparent table with very light white background and thicker borders */
     table {
       width: 50%;
       margin: 0 auto;
       border-collapse: collapse;
-      background: rgba(255, 255, 255, 0.9);
+      background: rgba(255, 255, 255, 0.2); /* very light white background */
       color: #000;
+      border: 3px solid rgba(255, 255, 255, 0.5); /* thicker borders */
       border-radius: 4px;
       overflow: hidden;
     }
     th, td {
-      border: 1px solid #ccc;
-      padding: 8px;
+      border: 3px solid rgba(255, 255, 255, 0.5); /* match table border thickness */
+      padding: 10px;
       text-align: center;
     }
     th {
-      background-color: #f2f2f2;
+      background-color: rgba(242, 242, 242, 0.8);
     }
     input {
       width: 100%;
       border: none;
       text-align: center;
       background: transparent;
+      font-size: 1rem;
+      color: #000;
     }
+    /* Progress container positioned further down, with added spacing */
     .progress-container {
       width: 50%;
-      margin: 10px auto;
-      background-color: #ddd;
+      margin: 30px auto 0;  /* Added extra margin-top to separate from table */
+      background-color: rgba(221, 221, 221, 0.8);
       border-radius: 10px;
       overflow: hidden;
     }
@@ -68,7 +73,7 @@
       background-color: #D61F1F;
       transition: width 0.5s;
     }
-    /* Lower Section: Positioned in bottom third, using a grid layout */
+    /* Lower Section remains unchanged from previous version */
     .lower-section {
       position: absolute;
       bottom: 20px;
@@ -79,10 +84,8 @@
       grid-template-columns: 1fr 1fr;
       grid-template-rows: 1fr 1fr;
       gap: 20px;
-      /* Adjust height as needed */
       height: 30%;
     }
-    /* Left cell spanning both rows for TOTAL WATCHED */
     .left-summary {
       grid-column: 1 / 2;
       grid-row: 1 / span 2;
@@ -91,7 +94,6 @@
       justify-content: center;
       align-items: center;
     }
-    /* Right column, each cell for one category */
     .right-summary {
       grid-column: 2 / 3;
       display: flex;
@@ -105,7 +107,6 @@
       align-items: center;
       width: 100%;
     }
-    /* First row: label and number side-by-side */
     .first-row {
       font-size: 1.5rem;
       display: flex;
@@ -116,34 +117,26 @@
       font-size: 2rem;
       color: #fff;
     }
-    /* Second row: sub-label stretched to match the width of the first row */
     .second-row {
       width: 100%;
       font-size: 1rem;
       text-align: center;
       margin-top: 5px;
     }
-    /* Center the content within each lower cell */
-    .left-summary .category,
-    .right-summary .category {
-      width: 100%;
-    }
   </style>
 </head>
 <body>
   <!-- Authentication Check -->
   <script>
-    // Redirect to password page if session flag not set
     if (sessionStorage.getItem('passwordEntered') !== 'true') {
       window.location.href = 'password.html';
     }
-    // Clear flag on refresh/leave so password is required every new visit.
     window.addEventListener('beforeunload', function() {
       sessionStorage.removeItem('passwordEntered');
     });
   </script>
 
-  <!-- Upper Section -->
+  <!-- Upper Section: Table and Progress Bar -->
   <div class="upper-section">
     <table>
       <thead>
@@ -159,9 +152,8 @@
     </div>
   </div>
 
-  <!-- Lower Section -->
+  <!-- Lower Section remains as before (categories will be discussed later) -->
   <div class="lower-section">
-    <!-- Left Cell: TOTAL WATCHED (spanning both rows) -->
     <div class="left-summary">
       <div class="category">
         <div class="first-row">
@@ -172,7 +164,6 @@
         </div>
       </div>
     </div>
-    <!-- Right Column: Two cells for MOVIES LEFT and MOVIES PER DAY -->
     <div class="right-summary">
       <div class="category" id="moviesLeftCategory">
         <div class="first-row">
@@ -193,7 +184,6 @@
     </div>
   </div>
 
-  <!-- Tracker Script -->
   <script>
     const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
     const currentMonthIndex = new Date().getMonth();
@@ -239,9 +229,7 @@
       let daysLeft = new Date(new Date().getFullYear(), currentMonthIndex + 1, 0).getDate() - new Date().getDate();
       let moviesPerDay = (moviesDifference > 0 && daysLeft > 0) ? (moviesDifference / daysLeft).toFixed(2) : 0;
       
-      // Update lower summary values
       document.getElementById("totalNumber").textContent = totalWatched;
-      // For MOVIES LEFT, show a positive value only when behind goal (else 0)
       let moviesLeft = moviesDifference > 0 ? moviesDifference : 0;
       document.getElementById("moviesLeftNumber").textContent = moviesLeft;
       document.getElementById("moviesPerDayNumber").textContent = moviesPerDay;
