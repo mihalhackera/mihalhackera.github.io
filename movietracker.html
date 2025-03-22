@@ -1,114 +1,115 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Movie Tracker</title>
-    <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin: 20px; }
-        table { width: 50%; margin: 20px auto; border-collapse: collapse; }
-        th, td { border: 1px solid black; padding: 8px; text-align: left; }
-        th { background-color: #f2f2f2; }
-        input { width: 100%; border: none; text-align: center; }
-        .progress-container { width: 50%; margin: 20px auto; background-color: #ddd; border-radius: 10px; overflow: hidden; }
-        .progress-bar { height: 20px; width: 0%; background-color: #D61F1F; transition: width 0.5s; }
-        h1 { font-size: 2rem; }
-        #summary { margin-top: 20px; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Movie Tracker</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; margin: 20px; }
+    table { width: 50%; margin: 20px auto; border-collapse: collapse; }
+    th, td { border: 1px solid black; padding: 8px; text-align: left; }
+    th { background-color: #f2f2f2; }
+    input { width: 100%; border: none; text-align: center; }
+    .progress-container { width: 50%; margin: 20px auto; background-color: #ddd; border-radius: 10px; overflow: hidden; }
+    .progress-bar { height: 20px; width: 0%; background-color: #D61F1F; transition: width 0.5s; }
+    #summary { margin-top: 20px; }
+  </style>
 </head>
 <body>
-    <h1>Movie Tracker</h1>
-    <table>
-        <thead>
-            <tr>
-                <th>Month</th>
-                <th>Movies Watched</th>
-            </tr>
-        </thead>
-        <tbody id="movieTable"></tbody>
-    </table>
-    <div class="progress-container">
-        <div class="progress-bar" id="progressBar"></div>
-    </div>
-    <p id="summary"></p>
-    
-    <script>
-        // Check if password has been entered
-        if (!localStorage.getItem('passwordEntered')) {
-            window.location.href = 'password.html'; // Redirect to password page if not entered
-        }
+  <h1>Movie Tracker</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>Month</th>
+        <th>Movies Watched</th>
+      </tr>
+    </thead>
+    <tbody id="movieTable"></tbody>
+  </table>
+  <div class="progress-container">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+  <p id="summary"></p>
 
-        const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-        const currentMonthIndex = new Date().getMonth();
-        const goalPerMonth = 20;
-        
-        function createTable() {
-            let tableBody = document.getElementById("movieTable");
-            tableBody.innerHTML = "";
-            
-            for (let i = 0; i <= currentMonthIndex; i++) {
-                let row = document.createElement("tr");
-                
-                let monthCell = document.createElement("td");
-                monthCell.textContent = months[i];
-                row.appendChild(monthCell);
-                
-                let moviesCell = document.createElement("td");
-                let input = document.createElement("input");
-                input.type = "number";
-                input.min = "0";
-                input.value = localStorage.getItem(months[i]) || "0";
-                input.addEventListener("input", updateSummary);
-                input.addEventListener("change", function() {
-                    localStorage.setItem(months[i], input.value);
-                });
-                moviesCell.appendChild(input);
-                row.appendChild(moviesCell);
-                
-                tableBody.appendChild(row);
-            }
-            updateSummary();
-        }
-        
-        function updateSummary() {
-            let totalWatched = 0;
-            document.querySelectorAll("tbody input").forEach(input => {
-                totalWatched += parseInt(input.value) || 0;
-            });
-            
-            let minExpected = currentMonthIndex * goalPerMonth;
-            let expectedTotal = (currentMonthIndex + 1) * goalPerMonth;
-            let moviesDifference = expectedTotal - totalWatched;
-            let daysLeft = new Date(new Date().getFullYear(), currentMonthIndex + 1, 0).getDate() - new Date().getDate();
-            let moviesPerDay = (moviesDifference > 0 && daysLeft > 0) ? (moviesDifference / daysLeft).toFixed(2) : 0;
-            
-            let summaryText = `Total watched: ${totalWatched} <br>`;
-            if (moviesDifference > 0) {
-                summaryText += `Movies to reach goal: ${moviesDifference} <br>`;
-            } else {
-                summaryText += `Movies ahead of goal: ${Math.abs(moviesDifference)} <br>`;
-            }
-            summaryText += `Movies per day needed: ${moviesPerDay}`;
-            
-            document.getElementById("summary").innerHTML = summaryText;
-            updateProgressBar(totalWatched, minExpected, expectedTotal);
-        }
-        
-        function updateProgressBar(watched, minGoal, maxGoal) {
-            let progress = Math.min((watched / maxGoal) * 100, 100);
-            let progressBar = document.getElementById("progressBar");
-            progressBar.style.width = progress + "%";
-            
-            if (watched < minGoal) {
-                progressBar.style.backgroundColor = "#D61F1F";
-            } else if (watched >= minGoal && watched < maxGoal) {
-                progressBar.style.backgroundColor = "#FFD301";
-            } else {
-                progressBar.style.backgroundColor = "#006B3D";
-            }
-        }
+  <script>
+    // If the session flag is not present, redirect to password page.
+    if (sessionStorage.getItem('passwordEntered') !== 'true') {
+      window.location.href = 'password.html';
+    }
 
-        createTable();
-    </script>
+    // When the page unloads (refresh or close), clear the session flag.
+    window.addEventListener('unload', function() {
+      sessionStorage.removeItem('passwordEntered');
+    });
+
+    // Movie Tracker code (example implementation)
+    const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    const currentMonthIndex = new Date().getMonth();
+    const goalPerMonth = 20;
+
+    function createTable() {
+      let tableBody = document.getElementById("movieTable");
+      tableBody.innerHTML = "";
+
+      for (let i = 0; i <= currentMonthIndex; i++) {
+        let row = document.createElement("tr");
+
+        let monthCell = document.createElement("td");
+        monthCell.textContent = months[i];
+        row.appendChild(monthCell);
+
+        let moviesCell = document.createElement("td");
+        let input = document.createElement("input");
+        input.type = "number";
+        input.min = "0";
+        input.value = localStorage.getItem(months[i]) || "0";
+        input.addEventListener("input", updateSummary);
+        input.addEventListener("change", function() {
+          localStorage.setItem(months[i], input.value);
+        });
+        moviesCell.appendChild(input);
+        row.appendChild(moviesCell);
+
+        tableBody.appendChild(row);
+      }
+      updateSummary();
+    }
+
+    function updateSummary() {
+      let totalWatched = 0;
+      document.querySelectorAll("tbody input").forEach(input => {
+        totalWatched += parseInt(input.value) || 0;
+      });
+
+      let minExpected = currentMonthIndex * goalPerMonth;
+      let expectedTotal = (currentMonthIndex + 1) * goalPerMonth;
+      let moviesDifference = expectedTotal - totalWatched;
+      let daysLeft = new Date(new Date().getFullYear(), currentMonthIndex + 1, 0).getDate() - new Date().getDate();
+      let moviesPerDay = (moviesDifference > 0 && daysLeft > 0) ? (moviesDifference / daysLeft).toFixed(2) : 0;
+
+      let summaryText = `Total watched: ${totalWatched} <br>`;
+      summaryText += (moviesDifference > 0) ? `Movies to reach goal: ${moviesDifference} <br>` : `Movies ahead of goal: ${Math.abs(moviesDifference)} <br>`;
+      summaryText += `Movies per day needed: ${moviesPerDay}`;
+
+      document.getElementById("summary").innerHTML = summaryText;
+      updateProgressBar(totalWatched, minExpected, expectedTotal);
+    }
+
+    function updateProgressBar(watched, minGoal, maxGoal) {
+      let progress = Math.min((watched / maxGoal) * 100, 100);
+      let progressBar = document.getElementById("progressBar");
+      progressBar.style.width = progress + "%";
+
+      if (watched < minGoal) {
+        progressBar.style.backgroundColor = "#D61F1F";
+      } else if (watched >= minGoal && watched < maxGoal) {
+        progressBar.style.backgroundColor = "#FFD301";
+      } else {
+        progressBar.style.backgroundColor = "#006B3D";
+      }
+    }
+
+    createTable();
+  </script>
 </body>
 </html>
