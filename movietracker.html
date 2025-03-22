@@ -32,17 +32,16 @@
   <p id="summary"></p>
 
   <script>
-    // If the session flag is not present, redirect to password page.
+    // If the session flag isn't present, force the user to enter the password
     if (sessionStorage.getItem('passwordEntered') !== 'true') {
       window.location.href = 'password.html';
     }
-
-    // When the page unloads (refresh or close), clear the session flag.
-    window.addEventListener('unload', function() {
+    // Clear the session flag when the user leaves or refreshes the page
+    window.addEventListener('beforeunload', function() {
       sessionStorage.removeItem('passwordEntered');
     });
 
-    // Movie Tracker code (example implementation)
+    // Movie Tracker code:
     const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
     const currentMonthIndex = new Date().getMonth();
     const goalPerMonth = 20;
@@ -50,14 +49,14 @@
     function createTable() {
       let tableBody = document.getElementById("movieTable");
       tableBody.innerHTML = "";
-
+      
       for (let i = 0; i <= currentMonthIndex; i++) {
         let row = document.createElement("tr");
-
+        
         let monthCell = document.createElement("td");
         monthCell.textContent = months[i];
         row.appendChild(monthCell);
-
+        
         let moviesCell = document.createElement("td");
         let input = document.createElement("input");
         input.type = "number";
@@ -69,7 +68,7 @@
         });
         moviesCell.appendChild(input);
         row.appendChild(moviesCell);
-
+        
         tableBody.appendChild(row);
       }
       updateSummary();
@@ -80,17 +79,17 @@
       document.querySelectorAll("tbody input").forEach(input => {
         totalWatched += parseInt(input.value) || 0;
       });
-
+      
       let minExpected = currentMonthIndex * goalPerMonth;
       let expectedTotal = (currentMonthIndex + 1) * goalPerMonth;
       let moviesDifference = expectedTotal - totalWatched;
       let daysLeft = new Date(new Date().getFullYear(), currentMonthIndex + 1, 0).getDate() - new Date().getDate();
       let moviesPerDay = (moviesDifference > 0 && daysLeft > 0) ? (moviesDifference / daysLeft).toFixed(2) : 0;
-
+      
       let summaryText = `Total watched: ${totalWatched} <br>`;
       summaryText += (moviesDifference > 0) ? `Movies to reach goal: ${moviesDifference} <br>` : `Movies ahead of goal: ${Math.abs(moviesDifference)} <br>`;
       summaryText += `Movies per day needed: ${moviesPerDay}`;
-
+      
       document.getElementById("summary").innerHTML = summaryText;
       updateProgressBar(totalWatched, minExpected, expectedTotal);
     }
@@ -99,7 +98,7 @@
       let progress = Math.min((watched / maxGoal) * 100, 100);
       let progressBar = document.getElementById("progressBar");
       progressBar.style.width = progress + "%";
-
+      
       if (watched < minGoal) {
         progressBar.style.backgroundColor = "#D61F1F";
       } else if (watched >= minGoal && watched < maxGoal) {
