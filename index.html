@@ -1,45 +1,97 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Movie Tracker</title>
-  <link rel="stylesheet" href="styles.css" />
   <script type="module" src="index.js" defer></script>
+  <script type="module" src="firebase.js" defer></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Futura:wght@400;600&display=swap');
+
+    body {
+      font-family: 'Futura', sans-serif;
+      background-color: #f4f4f9;
+      text-align: center;
+      margin: 0;
+    }
+
+    .corner-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      padding: 10px 15px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .corner-btn:hover {
+      background: #0056b3;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .movie-table {
+      margin: 50px auto;
+      width: 90%;
+      max-width: 600px;
+      border-collapse: collapse;
+    }
+
+    .movie-table th, .movie-table td {
+      border: 1px solid #ddd;
+      padding: 10px;
+    }
+
+    .movie-table th {
+      background-color: #007bff;
+      color: white;
+    }
+  </style>
 </head>
 <body>
 
-  <!-- Login/Signup Button -->
-  <button id="authBtn" class="corner-btn">Login / Sign Up</button>
-  
-  <!-- Authentication Form -->
-  <div id="authBox" class="modal">
-    <div class="modal-content">
-      <h2 id="authTitle">Login</h2>
-      <input type="email" id="email" placeholder="Email" />
-      <input type="password" id="password" placeholder="Password" />
-      <button id="authSubmit">Log In</button>
-      <p id="toggleAuth">Don't have an account? <a href="#" id="switchAuth">Sign Up</a></p>
-    </div>
+  <!-- Login Button -->
+  <button id="loginBtn" class="corner-btn">Login</button>
+
+  <!-- Logout Button -->
+  <button id="logoutBtn" class="corner-btn" style="display: none;">Logout</button>
+
+  <!-- Authentication Modal -->
+  <div id="authModal" class="modal">
+    <h2 id="authTitle">Login</h2>
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Password">
+    <button id="authSubmit">Log In</button>
+    <p>
+      <span id="toggleAuth">Don't have an account? <a href="#">Sign Up</a></span>
+    </p>
   </div>
 
   <!-- Movie Tracker Table -->
-  <div id="movieTracker">
-    <table id="movieTable">
-      <thead>
-        <tr>
-          <th>Title</th>
-          <th>Watched</th>
-        </tr>
-      </thead>
-      <tbody id="movieTableBody">
-        <!-- Movie Rows will go here -->
-      </tbody>
-    </table>
-  </div>
-
-  <!-- Logout Button -->
-  <button id="logoutBtn" class="corner-btn" style="display: none;">Log Out</button>
+  <h2>Your Movie Tracker</h2>
+  <table class="movie-table">
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Watched</th>
+      </tr>
+    </thead>
+    <tbody id="movieTableBody"></tbody>
+  </table>
 
 </body>
 </html>
