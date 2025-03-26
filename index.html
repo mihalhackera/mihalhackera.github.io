@@ -8,7 +8,7 @@
     body {
       margin: 0;
       padding: 0;
-      font-family: Arial, sans-serif;
+      font-family: 'Futura', sans-serif; /* Applied Futura font */
       background: #fdfcf7;
       color: #000;
       text-align: center;
@@ -31,6 +31,7 @@
     }
     th {
       background-color: #eaeaea;
+      font-weight: normal;
     }
     input {
       width: 100%;
@@ -139,7 +140,7 @@
 
     function createTable() {
       let tableBody = document.getElementById("movieTable");
-      tableBody.innerHTML = ""; // Clear the table body
+      tableBody.innerHTML = "";
 
       for (let i = 0; i <= currentMonthIndex; i++) {
         let row = document.createElement("tr");
@@ -152,10 +153,10 @@
         let input = document.createElement("input");
         input.type = "number";
         input.min = "0";
-        input.value = localStorage.getItem(months[i]) || "0"; // Load from localStorage
+        input.value = localStorage.getItem(months[i]) || "0";
         input.addEventListener("input", updateSummary);
         input.addEventListener("change", function() {
-          localStorage.setItem(months[i], input.value); // Save to localStorage
+          localStorage.setItem(months[i], input.value);
         });
         moviesCell.appendChild(input);
         row.appendChild(moviesCell);
@@ -179,6 +180,7 @@
 
       // Update lower summary values
       document.getElementById("totalNumber").textContent = totalWatched;
+      // For MOVIES LEFT, show a positive value only when behind goal (else 0)
       let moviesLeft = moviesDifference > 0 ? moviesDifference : 0;
       document.getElementById("moviesLeftNumber").textContent = moviesLeft;
       document.getElementById("moviesPerDayNumber").textContent = moviesPerDay;
@@ -200,7 +202,7 @@
       }
     }
 
-    createTable(); // Initialize the table
+    createTable();
   </script>
 
 </body>
