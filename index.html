@@ -139,7 +139,7 @@
 
     function createTable() {
       let tableBody = document.getElementById("movieTable");
-      tableBody.innerHTML = "";
+      tableBody.innerHTML = ""; // Clear the table body
 
       for (let i = 0; i <= currentMonthIndex; i++) {
         let row = document.createElement("tr");
@@ -152,10 +152,10 @@
         let input = document.createElement("input");
         input.type = "number";
         input.min = "0";
-        input.value = localStorage.getItem(months[i]) || "0";
+        input.value = localStorage.getItem(months[i]) || "0"; // Load from localStorage
         input.addEventListener("input", updateSummary);
         input.addEventListener("change", function() {
-          localStorage.setItem(months[i], input.value);
+          localStorage.setItem(months[i], input.value); // Save to localStorage
         });
         moviesCell.appendChild(input);
         row.appendChild(moviesCell);
@@ -179,7 +179,6 @@
 
       // Update lower summary values
       document.getElementById("totalNumber").textContent = totalWatched;
-      // For MOVIES LEFT, show a positive value only when behind goal (else 0)
       let moviesLeft = moviesDifference > 0 ? moviesDifference : 0;
       document.getElementById("moviesLeftNumber").textContent = moviesLeft;
       document.getElementById("moviesPerDayNumber").textContent = moviesPerDay;
@@ -201,7 +200,7 @@
       }
     }
 
-    createTable();
+    createTable(); // Initialize the table
   </script>
 
 </body>
