@@ -4,45 +4,205 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Movie Tracker</title>
-  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background: #fdfcf7;
+      color: #000;
+      text-align: center;
+    }
+
+    /* Table Styling */
+    table {
+      width: 50%;
+      margin: 20px auto;
+      border-collapse: collapse;
+      background: rgba(0, 0, 0, 0.05);
+      color: #000;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: center;
+    }
+    th {
+      background-color: #eaeaea;
+    }
+    input {
+      width: 100%;
+      border: none;
+      text-align: center;
+      background: transparent;
+    }
+
+    /* Progress Bar */
+    .progress-container {
+      width: 50%;
+      margin: 10px auto;
+      background-color: #ddd;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .progress-bar {
+      height: 20px;
+      width: 0%;
+      background-color: #D61F1F;
+      transition: width 0.5s;
+    }
+
+    /* Summary Section */
+    .summary-container {
+      margin-top: 30px;
+    }
+
+    .total-watched {
+      font-size: 3rem;
+      font-weight: bold;
+      line-height: 1;
+    }
+
+    .watched-label {
+      font-size: 1.5rem;
+      text-transform: uppercase;
+      letter-spacing: 5px;
+      display: block;
+    }
+
+    .stats-row {
+      display: flex;
+      justify-content: center;
+      gap: 50px;
+      margin-top: 20px;
+    }
+
+    .stat-box {
+      text-align: center;
+    }
+
+    .stat-box .number {
+      font-size: 2rem;
+      font-weight: bold;
+    }
+
+    .stat-box .label {
+      font-size: 1.2rem;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      display: block;
+    }
+  </style>
 </head>
 <body>
 
-  <!-- Movie Tracker -->
-  <div class="movie-tracker-container">
-    <table>
-      <thead>
-        <tr>
-          <th>Month</th>
-          <th>Movies Watched</th>
-        </tr>
-      </thead>
-      <tbody id="movieTable"></tbody>
-    </table>
+  <!-- Movie Table -->
+  <table>
+    <thead>
+      <tr>
+        <th>Month</th>
+        <th>Movies Watched</th>
+      </tr>
+    </thead>
+    <tbody id="movieTable"></tbody>
+  </table>
 
-    <!-- Progress Bar -->
-    <div class="progress-container">
-      <div class="progress-bar" id="progressBar"></div>
-    </div>
+  <!-- Progress Bar -->
+  <div class="progress-container">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
 
-    <!-- Summary Section -->
-    <div class="summary-container">
-      <div class="total-watched" id="totalNumber">0</div>
-      <div class="watched-label">WATCHED</div>
+  <!-- Summary Section -->
+  <div class="summary-container">
+    <div class="total-watched" id="totalNumber">0</div>
+    <div class="watched-label">WATCHED</div>
 
-      <div class="stats-row">
-        <div class="stat-box">
-          <div class="number" id="moviesLeftNumber">0</div>
-          <div class="label">MOVIES LEFT</div>
-        </div>
-        <div class="stat-box">
-          <div class="number" id="moviesPerDayNumber">0</div>
-          <div class="label">MOVIES PER DAY</div>
-        </div>
+    <div class="stats-row">
+      <div class="stat-box">
+        <div class="number" id="moviesLeftNumber">0</div>
+        <div class="label">MOVIES LEFT</div>
+      </div>
+      <div class="stat-box">
+        <div class="number" id="moviesPerDayNumber">0</div>
+        <div class="label">MOVIES PER DAY</div>
       </div>
     </div>
   </div>
 
-  <script src="movieTracker.js"></script>
+  <!-- Tracker Script -->
+  <script>
+    const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    const currentMonthIndex = new Date().getMonth();
+    const goalPerMonth = 20;
+
+    function createTable() {
+      let tableBody = document.getElementById("movieTable");
+      tableBody.innerHTML = "";
+
+      for (let i = 0; i <= currentMonthIndex; i++) {
+        let row = document.createElement("tr");
+
+        let monthCell = document.createElement("td");
+        monthCell.textContent = months[i];
+        row.appendChild(monthCell);
+
+        let moviesCell = document.createElement("td");
+        let input = document.createElement("input");
+        input.type = "number";
+        input.min = "0";
+        input.value = localStorage.getItem(months[i]) || "0";
+        input.addEventListener("input", updateSummary);
+        input.addEventListener("change", function() {
+          localStorage.setItem(months[i], input.value);
+        });
+        moviesCell.appendChild(input);
+        row.appendChild(moviesCell);
+
+        tableBody.appendChild(row);
+      }
+      updateSummary();
+    }
+
+    function updateSummary() {
+      let totalWatched = 0;
+      document.querySelectorAll("tbody input").forEach(input => {
+        totalWatched += parseInt(input.value) || 0;
+      });
+
+      let minExpected = currentMonthIndex * goalPerMonth;
+      let expectedTotal = (currentMonthIndex + 1) * goalPerMonth;
+      let moviesDifference = expectedTotal - totalWatched;
+      let daysLeft = new Date(new Date().getFullYear(), currentMonthIndex + 1, 0).getDate() - new Date().getDate();
+      let moviesPerDay = (moviesDifference > 0 && daysLeft > 0) ? (moviesDifference / daysLeft).toFixed(2) : 0;
+
+      // Update lower summary values
+      document.getElementById("totalNumber").textContent = totalWatched;
+      // For MOVIES LEFT, show a positive value only when behind goal (else 0)
+      let moviesLeft = moviesDifference > 0 ? moviesDifference : 0;
+      document.getElementById("moviesLeftNumber").textContent = moviesLeft;
+      document.getElementById("moviesPerDayNumber").textContent = moviesPerDay;
+
+      updateProgressBar(totalWatched, minExpected, expectedTotal);
+    }
+
+    function updateProgressBar(watched, minGoal, maxGoal) {
+      let progress = Math.min((watched / maxGoal) * 100, 100);
+      let progressBar = document.getElementById("progressBar");
+      progressBar.style.width = progress + "%";
+
+      if (watched < minGoal) {
+        progressBar.style.backgroundColor = "#D61F1F";
+      } else if (watched >= minGoal && watched < maxGoal) {
+        progressBar.style.backgroundColor = "#FFD301";
+      } else {
+        progressBar.style.backgroundColor = "#006B3D";
+      }
+    }
+
+    createTable();
+  </script>
+
 </body>
 </html>
