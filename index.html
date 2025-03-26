@@ -141,33 +141,43 @@
     const currentMonthIndex = new Date().getMonth();
     const goalPerMonth = 20;
 
-    function createTable() {
-      let tableBody = document.getElementById("movieTable");
-      tableBody.innerHTML = "";
+function createTable() {
+  let tableBody = document.getElementById("movieTable");
+  tableBody.innerHTML = "";
 
-      for (let i = 0; i <= currentMonthIndex; i++) {
-        let row = document.createElement("tr");
+  for (let i = 0; i <= currentMonthIndex; i++) {
+    let row = document.createElement("tr");
 
-        let monthCell = document.createElement("td");
-        monthCell.textContent = months[i];
-        row.appendChild(monthCell);
+    let monthCell = document.createElement("td");
+    monthCell.textContent = months[i];
+    row.appendChild(monthCell);
 
-        let moviesCell = document.createElement("td");
-        let input = document.createElement("input");
-        input.type = "number";
-        input.min = "0";
-        input.value = localStorage.getItem(months[i]) || "0";
-        input.addEventListener("input", updateSummary);
-        input.addEventListener("change", function() {
-          localStorage.setItem(months[i], input.value);
-        });
-        moviesCell.appendChild(input);
-        row.appendChild(moviesCell);
+    let moviesCell = document.createElement("td");
+    let input = document.createElement("input");
+    input.type = "number";
+    input.min = "0";
 
-        tableBody.appendChild(row);
-      }
-      updateSummary();
+    // Set default values for January and February
+    if (months[i] === "January") {
+      input.value = localStorage.getItem(months[i]) || "18";
+    } else if (months[i] === "February") {
+      input.value = localStorage.getItem(months[i]) || "19";
+    } else {
+      input.value = localStorage.getItem(months[i]) || "0";
     }
+
+    input.addEventListener("input", updateSummary);
+    input.addEventListener("change", function() {
+      localStorage.setItem(months[i], input.value);
+    });
+    moviesCell.appendChild(input);
+    row.appendChild(moviesCell);
+
+    tableBody.appendChild(row);
+  }
+  updateSummary();
+}
+
 
     function updateSummary() {
       let totalWatched = 0;
