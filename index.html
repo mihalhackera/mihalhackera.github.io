@@ -4,111 +4,32 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Movie Tracker</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f9f9f9;
-      margin: 0;
-      padding: 0;
-    }
-    
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 20px;
-      background-color: #333;
-      color: #fff;
-    }
-    
-    .header .logout-btn {
-      font-size: 1.2rem;
-      cursor: pointer;
-      background-color: #D61F1F;
-      color: white;
-      border: none;
-      padding: 10px;
-      border-radius: 5px;
-    }
-
-    .form-container {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      margin-top: 20px;
-    }
-
-    .form-container input {
-      margin: 10px;
-      padding: 10px;
-      width: 250px;
-      font-size: 1rem;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-    }
-
-    .table-container {
-      width: 80%;
-      margin: 30px auto;
-      background-color: white;
-      padding: 20px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      border-radius: 8px;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    th, td {
-      padding: 10px;
-      text-align: center;
-      border: 1px solid #ddd;
-    }
-
-    th {
-      background-color: #f4f4f4;
-    }
-
-    .hidden {
-      display: none;
-    }
-  </style>
+  <link rel="stylesheet" href="styles.css" />
+  <script type="module" src="index.js" defer></script>
 </head>
 <body>
-  <!-- Header with logout button -->
-  <div class="header">
-    <div class="title">Movie Tracker</div>
-    <button id="logoutBtn" class="logout-btn hidden">Log Out</button>
+  <div id="authForm" style="display: none;">
+    <h2>Login or Sign Up</h2>
+    <input type="email" id="email" placeholder="Email" />
+    <input type="password" id="password" placeholder="Password" />
+    <button id="authBtn">Log In</button>
+    <p>Don't have an account? <a href="#" id="signUpLink">Sign Up</a></p>
   </div>
 
-  <!-- Form container (Sign Up / Sign In) -->
-  <div id="authForm" class="form-container">
-    <input type="email" id="email" placeholder="Enter your email" />
-    <input type="password" id="password" placeholder="Enter your password" />
-    <button id="authBtn">Sign Up / Sign In</button>
-  </div>
-
-  <!-- Movie table container -->
-  <div id="movieTracker" class="table-container hidden">
+  <div id="movieTracker">
+    <!-- Movie tracker table will be here -->
     <table id="movieTable">
       <thead>
         <tr>
-          <th>Month</th>
-          <th>Movies Watched</th>
+          <th>Title</th>
+          <th>Watched</th>
         </tr>
       </thead>
       <tbody id="movieTableBody"></tbody>
     </table>
-    <div class="progress-container">
-      <div class="progress-bar" id="progressBar"></div>
-    </div>
-  </div>
 
-  <!-- Firebase and custom JS file -->
-  <script type="module" src="firebase.js"></script>
-  <script src="index.js"></script>
+    <!-- Log out button -->
+    <button id="logoutBtn" style="display: none;">Log Out</button>
+  </div>
 </body>
 </html>
