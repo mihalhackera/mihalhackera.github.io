@@ -8,13 +8,19 @@
   <script type="module" src="index.js" defer></script>
 </head>
 <body>
-  <!-- Login Form Above the Table -->
-  <div id="authForm">
-    <h2>Login</h2>
-    <input type="email" id="email" placeholder="Email" />
-    <input type="password" id="password" placeholder="Password" />
-    <button id="authBtn">Log In</button>
-    <p>Don't have an account? <a href="#" id="signUpLink">Sign Up</a></p>
+
+  <!-- Login/Signup Button -->
+  <button id="authBtn" class="corner-btn">Login / Sign Up</button>
+  
+  <!-- Authentication Form -->
+  <div id="authBox" class="modal">
+    <div class="modal-content">
+      <h2 id="authTitle">Login</h2>
+      <input type="email" id="email" placeholder="Email" />
+      <input type="password" id="password" placeholder="Password" />
+      <button id="authSubmit">Log In</button>
+      <p id="toggleAuth">Don't have an account? <a href="#" id="switchAuth">Sign Up</a></p>
+    </div>
   </div>
 
   <!-- Movie Tracker Table -->
@@ -32,7 +38,8 @@
     </table>
   </div>
 
-  <!-- Log Out Button -->
-  <button id="logoutBtn" style="display: none;">Log Out</button>
+  <!-- Logout Button -->
+  <button id="logoutBtn" class="corner-btn" style="display: none;">Log Out</button>
+
 </body>
 </html>
