@@ -4,94 +4,54 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Movie Tracker</title>
-  <script type="module" src="index.js" defer></script>
-  <script type="module" src="firebase.js" defer></script>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Futura:wght@400;600&display=swap');
-
-    body {
-      font-family: 'Futura', sans-serif;
-      background-color: #f4f4f9;
-      text-align: center;
-      margin: 0;
-    }
-
-    .corner-btn {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      padding: 10px 15px;
-      background: #007bff;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    .corner-btn:hover {
-      background: #0056b3;
-    }
-
-    .modal {
-      display: none;
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: white;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-
-    .movie-table {
-      margin: 50px auto;
-      width: 90%;
-      max-width: 600px;
-      border-collapse: collapse;
-    }
-
-    .movie-table th, .movie-table td {
-      border: 1px solid #ddd;
-      padding: 10px;
-    }
-
-    .movie-table th {
-      background-color: #007bff;
-      color: white;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- Login Button -->
-  <button id="loginBtn" class="corner-btn">Login</button>
-
-  <!-- Logout Button -->
-  <button id="logoutBtn" class="corner-btn" style="display: none;">Logout</button>
-
-  <!-- Authentication Modal -->
-  <div id="authModal" class="modal">
-    <h2 id="authTitle">Login</h2>
-    <input type="email" id="email" placeholder="Email">
-    <input type="password" id="password" placeholder="Password">
-    <button id="authSubmit">Log In</button>
-    <p>
-      <span id="toggleAuth">Don't have an account? <a href="#">Sign Up</a></span>
-    </p>
+  <!-- Login Section -->
+  <div class="login-container">
+    <form id="loginForm">
+      <input type="text" id="username" placeholder="Username" required>
+      <input type="password" id="password" placeholder="Password" required>
+      <button type="submit">Log In</button>
+    </form>
   </div>
 
-  <!-- Movie Tracker Table -->
-  <h2>Your Movie Tracker</h2>
-  <table class="movie-table">
-    <thead>
-      <tr>
-        <th>Title</th>
-        <th>Watched</th>
-      </tr>
-    </thead>
-    <tbody id="movieTableBody"></tbody>
-  </table>
+  <!-- Movie Tracker -->
+  <div class="movie-tracker-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Month</th>
+          <th>Movies Watched</th>
+        </tr>
+      </thead>
+      <tbody id="movieTable"></tbody>
+    </table>
 
+    <!-- Progress Bar -->
+    <div class="progress-container">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <!-- Summary Section -->
+    <div class="summary-container">
+      <div class="total-watched" id="totalNumber">0</div>
+      <div class="watched-label">WATCHED</div>
+
+      <div class="stats-row">
+        <div class="stat-box">
+          <div class="number" id="moviesLeftNumber">0</div>
+          <div class="label">MOVIES LEFT</div>
+        </div>
+        <div class="stat-box">
+          <div class="number" id="moviesPerDayNumber">0</div>
+          <div class="label">MOVIES PER DAY</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="movieTracker.js"></script>
 </body>
 </html>
