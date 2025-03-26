@@ -8,16 +8,17 @@
   <script type="module" src="index.js" defer></script>
 </head>
 <body>
-  <div id="authForm" style="display: none;">
-    <h2>Login or Sign Up</h2>
+  <!-- Login Form Above the Table -->
+  <div id="authForm">
+    <h2>Login</h2>
     <input type="email" id="email" placeholder="Email" />
     <input type="password" id="password" placeholder="Password" />
     <button id="authBtn">Log In</button>
     <p>Don't have an account? <a href="#" id="signUpLink">Sign Up</a></p>
   </div>
 
+  <!-- Movie Tracker Table -->
   <div id="movieTracker">
-    <!-- Movie tracker table will be here -->
     <table id="movieTable">
       <thead>
         <tr>
@@ -25,11 +26,13 @@
           <th>Watched</th>
         </tr>
       </thead>
-      <tbody id="movieTableBody"></tbody>
+      <tbody id="movieTableBody">
+        <!-- Movie Rows will go here -->
+      </tbody>
     </table>
-
-    <!-- Log out button -->
-    <button id="logoutBtn" style="display: none;">Log Out</button>
   </div>
+
+  <!-- Log Out Button -->
+  <button id="logoutBtn" style="display: none;">Log Out</button>
 </body>
 </html>
