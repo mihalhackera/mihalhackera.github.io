@@ -7,6 +7,25 @@
   <meta http-equiv="refresh" content="0; url=movietracker.html">
 </head>
 <body>
+  <!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
+
+<script>
+  // Initialize Firebase
+  const firebaseConfig = {
+    apiKey: "AIzaSyDZdmE3zm6o9DtEzszi7MKrGANfnq09OmU",
+    authDomain: "movie-tracker-fb315.firebaseapp.com",
+    projectId: "movie-tracker-fb315",
+    storageBucket: "movie-tracker-fb315.firebasestorage.app",
+    messagingSenderId: "947600616325",
+    appId: "1:947600616325:web:964417033382fd54d2f2ec"
+};
+
+  // Initialize Firebase
+  const app = firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+</script>
 </body>
 </html>
 
