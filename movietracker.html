@@ -4,195 +4,101 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Movie Tracker</title>
-
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Playfair+Display:wght@700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;600&display=swap" rel="stylesheet">
   <style>
-    /* Global Styles */
     body {
-      margin: 0;
-      padding: 0;
       font-family: 'Poppins', sans-serif;
-      background: #FAFAF5;
-      color: #222;
-      text-align: center;
-    }
-
-    /* Table Styling */
-    .table-container {
-      margin: 40px auto;
-      width: 80%;
-      max-width: 600px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-    }
-    th, td {
-      padding: 12px;
-      border: 1px solid #ddd;
-      text-align: center;
-      font-family: 'Inter', sans-serif;
-    }
-    th {
-      background-color: #f4f4f4;
-    }
-    input {
-      width: 100%;
-      border: none;
-      text-align: center;
-      font-size: 16px;
-      font-family: 'Inter', sans-serif;
-    }
-
-    /* Summary Section */
-    .summary-container {
+      background-color: #f4f4f9;
       display: flex;
+      flex-direction: column;
       justify-content: center;
-      gap: 50px;
-      margin-top: 30px;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
     }
 
-    .total-watched {
-      font-size: 80px;
-      font-family: 'Playfair Display', serif;
-      font-weight: 700;
-      line-height: 1;
+    .auth-box, .logout-btn {
+      position: absolute;
+      top: 20px;
     }
 
-    .label {
-      font-size: 16px;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      font-weight: 600;
-      color: #666;
+    .auth-box {
+      display: none; /* Hidden by default, will be displayed based on auth status */
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      text-align: center;
     }
 
-    /* Progress Bar */
-    .progress-container {
-      margin: 30px auto;
-      width: 80%;
-      max-width: 600px;
-      background: #ddd;
-      border-radius: 10px;
-      overflow: hidden;
+    .auth-box input {
+      padding: 10px;
+      margin-bottom: 10px;
+      width: 250px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
     }
-    .progress-bar {
-      height: 20px;
-      width: 0%;
-      background: #D61F1F;
-      transition: width 0.5s;
+
+    .auth-box button {
+      padding: 10px 20px;
+      width: 100%;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
     }
+
+    .auth-box button:hover {
+      background-color: #0056b3;
+    }
+
+    .logout-btn {
+      top: 10px;
+      right: 20px;
+      font-size: 18px;
+      cursor: pointer;
+      display: none; /* Hidden by default, will show after login */
+    }
+
+    .tracker-table {
+      margin-top: 100px;
+      width: 90%;
+      max-width: 1000px;
+      padding: 20px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Add your movie tracker table styles here */
   </style>
 </head>
 <body>
 
-  <!-- Table Section -->
-  <div class="table-container">
-    <table>
-      <thead>
-        <tr>
-          <th>Month</th>
-          <th>Movies Watched</th>
-        </tr>
-      </thead>
-      <tbody id="movieTable"></tbody>
-    </table>
+  <!-- Authentication Form -->
+  <div class="auth-box" id="authBox">
+    <h2 id="authTitle">Sign Up</h2>
+    <form id="authForm">
+      <input type="email" id="email" placeholder="Enter your email" required />
+      <input type="password" id="password" placeholder="Enter your password" required />
+      <button type="submit" id="authSubmit">Sign Up</button>
+    </form>
+    <p id="toggleAuth">Already have an account? <a href="javascript:void(0);" id="switchToLogin">Login</a></p>
   </div>
 
-  <!-- Progress Bar -->
-  <div class="progress-container">
-    <div class="progress-bar" id="progressBar"></div>
+  <!-- Logout Button -->
+  <span class="logout-btn" id="logoutBtn" onclick="signOutUser()">Logout</span>
+
+  <!-- Movie Tracker Table -->
+  <div class="tracker-table" id="trackerTable">
+    <!-- Your movie tracker table content will go here -->
+    <h2>Your Movie Tracker</h2>
+    <p>Track your movies here!</p>
+    <!-- Add your table here -->
   </div>
 
-  <!-- Summary Section -->
-  <div class="summary-container">
-    <div>
-      <div class="total-watched" id="totalNumber">0</div>
-      <div class="label">WATCHED</div>
-    </div>
-    <div>
-      <div class="total-watched" id="moviesLeftNumber">0</div>
-      <div class="label">LEFT</div>
-    </div>
-    <div>
-      <div class="total-watched" id="moviesPerDayNumber">0</div>
-      <div class="label">PER DAY</div>
-    </div>
-  </div>
-
-  <script>
-    const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-    const currentMonthIndex = new Date().getMonth();
-    const goalPerMonth = 20;
-    
-    function createTable() {
-      let tableBody = document.getElementById("movieTable");
-      tableBody.innerHTML = "";
-
-      for (let i = 0; i <= currentMonthIndex; i++) {
-        let row = document.createElement("tr");
-
-        let monthCell = document.createElement("td");
-        monthCell.textContent = months[i];
-        row.appendChild(monthCell);
-
-        let moviesCell = document.createElement("td");
-        let input = document.createElement("input");
-        input.type = "number";
-        input.min = "0";
-        input.value = localStorage.getItem(months[i]) || "0";
-        input.addEventListener("input", updateSummary);
-        input.addEventListener("change", function() {
-          localStorage.setItem(months[i], input.value);
-        });
-        moviesCell.appendChild(input);
-        row.appendChild(moviesCell);
-
-        tableBody.appendChild(row);
-      }
-      updateSummary();
-    }
-
-    function updateSummary() {
-      let totalWatched = 0;
-      document.querySelectorAll("tbody input").forEach(input => {
-        totalWatched += parseInt(input.value) || 0;
-      });
-
-      let expectedTotal = (currentMonthIndex + 1) * goalPerMonth;
-      let moviesDifference = expectedTotal - totalWatched;
-      let daysLeft = new Date(new Date().getFullYear(), currentMonthIndex + 1, 0).getDate() - new Date().getDate();
-      let moviesPerDay = (moviesDifference > 0 && daysLeft > 0) ? (moviesDifference / daysLeft).toFixed(2) : 0;
-
-      // Update summary values
-      document.getElementById("totalNumber").textContent = totalWatched;
-      document.getElementById("moviesLeftNumber").textContent = moviesDifference > 0 ? moviesDifference : 0;
-      document.getElementById("moviesPerDayNumber").textContent = moviesPerDay;
-
-      updateProgressBar(totalWatched, expectedTotal);
-    }
-
-    function updateProgressBar(watched, maxGoal) {
-      let progress = Math.min((watched / maxGoal) * 100, 100);
-      let progressBar = document.getElementById("progressBar");
-      progressBar.style.width = progress + "%";
-
-      if (watched < maxGoal * 0.5) {
-        progressBar.style.backgroundColor = "#D61F1F"; // Red if far from goal
-      } else if (watched >= maxGoal * 0.5 && watched < maxGoal) {
-        progressBar.style.backgroundColor = "#FFD301"; // Yellow if close
-      } else {
-        progressBar.style.backgroundColor = "#006B3D"; // Green if reached
-      }
-    }
-
-    createTable();
-  </script>
+  <script type="module" src="firebase.js"></script>
 
 </body>
 </html>
