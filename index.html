@@ -157,21 +157,24 @@ function createTable() {
     input.type = "number";
     input.min = "0";
 
-    // Set default values for January and February
+    // Set locked values for Jan, Feb, and March
     if (months[i] === "January") {
-      input.value = localStorage.getItem(months[i]) || "18";
+      input.value = "18";
+      input.readOnly = true;
     } else if (months[i] === "February") {
-      input.value = localStorage.getItem(months[i]) || "19";
+      input.value = "19";
+      input.readOnly = true;
     } else if (months[i] === "March") {
-      input.value = localStorage.getItem(months[i]) || "22";
+      input.value = "22";
+      input.readOnly = true;
     } else {
       input.value = localStorage.getItem(months[i]) || "0";
+      input.addEventListener("input", updateSummary);
+      input.addEventListener("change", function() {
+        localStorage.setItem(months[i], input.value);
+      });
     }
 
-    input.addEventListener("input", updateSummary);
-    input.addEventListener("change", function() {
-      localStorage.setItem(months[i], input.value);
-    });
     moviesCell.appendChild(input);
     row.appendChild(moviesCell);
 
@@ -179,7 +182,6 @@ function createTable() {
   }
   updateSummary();
 }
-
 
     function updateSummary() {
       let totalWatched = 0;
