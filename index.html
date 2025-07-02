@@ -1,226 +1,307 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>movie tracker</title>
-  <link rel="icon" type="image/png" href="favicon.png">
+  <meta charset="UTF-8" />
+  <title>July Hobby Tracker</title>
   <style>
-    body {
+    :root {
+      --bg: #000;
+      --text: #fff;
+      --faint-emoji: rgba(255, 255, 255, 0.07);
+    }
+
+    * {
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: 'Futura', sans-serif; /* Changed font to Futura */
-      background: #fdfcf7;
-      color: #000;
-      text-align: center;
+      font-family: sans-serif;
     }
 
-    /* Table Styling */
-    table {
-      width: 50%;
-      margin: 20px auto;
-      border-collapse: collapse;
-      background: rgba(0, 0, 0, 0.05);
-      color: #000;
-      border-radius: 4px;
-      overflow: hidden;
-    }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 8px;
-      text-align: center;
-    }
-    th {
-      background-color: #eaeaea;
-    }
-    input {
-      width: 100%;
-      border: none;
-      text-align: center;
-      background: transparent;
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      padding: 2rem;
+      gap: 3rem;
     }
 
-    /* Progress Bar */
-    .progress-container {
-      width: 50%;
-      margin: 10px auto;
-      background-color: #ddd;
-      border-radius: 10px;
-      overflow: hidden;
-    }
-    .progress-bar {
-      height: 20px;
-      width: 0%;
-      background-color: #D61F1F;
-      transition: width 0.5s;
+    .calendar {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
     }
 
-    /* Summary Section */
-    .summary-container {
-      margin-top: 30px;
-    }
-
-    .total-watched {
-      font-size: 3rem;
-      font-weight: bold;
-      line-height: 1;
-    }
-
-    .watched-label {
-      font-size: 1.5rem;
-      text-transform: uppercase;
-      letter-spacing: 5px;
-      display: block;
-    }
-
-   .stats-row {
-  display: flex;
-  justify-content: center;
-  align-items: center; /* Ensures vertical alignment */
-  gap: 50px;
-  margin-top: 20px;
-  text-align: center;
-  width: 100%; /* Ensures full width */
-}
-
-    .stat-box {
-      text-align: center;
-    }
-
-    .stat-box .number {
+    .month-label {
       font-size: 2rem;
       font-weight: bold;
     }
 
-    .stat-box .label {
-      font-size: 1.2rem;
-      text-transform: uppercase;
-      letter-spacing: 3px;
-      display: block;
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 0.5rem;
+    }
+
+    .day {
+      aspect-ratio: 1 / 1;
+      border: 2px solid var(--text);
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      padding: 0.3rem;
+      justify-content: space-between;
+      position: relative;
+      transition: transform 0.2s ease;
+      cursor: default;
+    }
+
+    .day.future {
+      color: grey;
+      border-color: grey;
+    }
+
+    .day.editable {
+      cursor: text;
+    }
+
+    /* Hover scale effect without background */
+    .day.editable:hover {
+      transform: scale(1.05);
+      z-index: 10; /* Make sure it’s above siblings */
+    }
+
+    .day-number {
+      font-size: 0.9rem;
+      font-weight: bold;
+      z-index: 2;
+      position: relative;
+    }
+
+    .inputs {
+      flex-grow: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      align-items: center;
+      justify-items: center;
+      gap: 0.2rem;
+      position: relative;
+      z-index: 2;
+    }
+
+    .inputs input[type="number"] {
+      width: 1.5rem;
+      border: none;
+      border-bottom: 1px solid var(--text);
+      background: transparent;
+      text-align: center;
+      color: var(--text);
+      font-size: 0.8rem;
+      outline-offset: 2px;
+      /* Remove spinners for Firefox fallback */
+      -moz-appearance: textfield;
+    }
+    /* Remove number input spinners for Chrome, Safari, Edge */
+    .inputs input[type=number]::-webkit-inner-spin-button, 
+    .inputs input[type=number]::-webkit-outer-spin-button { 
+      -webkit-appearance: none; 
+      margin: 0; 
+    }
+
+    .inputs input[type="checkbox"] {
+      appearance: none;
+      width: 1rem;
+      height: 1rem;
+      border: 1px solid var(--text);
+      background: transparent;
+      border-radius: 2px;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .inputs input[type="checkbox"]:checked::after {
+      content: "";
+      position: absolute;
+      top: 2px;
+      left: 4px;
+      width: 4px;
+      height: 8px;
+      border: solid var(--text);
+      border-width: 0 1px 1px 0;
+      transform: rotate(45deg);
+    }
+
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
-
-  <!-- Movie Table -->
-  <table>
-    <thead>
-      <tr>
-        <th>Month</th>
-        <th>Movies Watched</th>
-      </tr>
-    </thead>
-    <tbody id="movieTable"></tbody>
-  </table>
-
-  <!-- Progress Bar -->
-  <div class="progress-container">
-    <div class="progress-bar" id="progressBar"></div>
+  <div class="calendar">
+    <div class="month-label">July 2025</div>
+    <div class="grid" id="calendar"></div>
+  </div>
+  <div class="sidebar">
+    <div><span id="movie-total">87</span> movies watched</div>
+    <div><span id="book-total">0.51</span> books read</div>
+    <div><span id="draw-total">0</span> days drawing practiced</div>
+    <div><span id="music-total">0</span> days music practiced</div>
   </div>
 
-  <!-- Summary Section -->
-  <div class="summary-container">
-    <div class="total-watched" id="totalNumber">0</div>
-    <div class="watched-label">WATCHED</div>
-
-    <div class="stats-row">
-      <div class="stat-box">
-        <div class="number" id="moviesLeftNumber">0</div>
-        <div class="label">LEFT</div>
-      </div>
-      <div class="stat-box">
-        <div class="number" id="moviesPerDayNumber">0</div>
-        <div class="label">PER DAY</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Tracker Script -->
   <script>
-    const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-    const currentMonthIndex = new Date().getMonth();
-    const goalPerMonth = 20;
+    const calendar = document.getElementById("calendar");
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = 6; // July is 6 (0-based)
 
-function createTable() {
-  let tableBody = document.getElementById("movieTable");
-  tableBody.innerHTML = "";
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const firstDay = new Date(year, month, 1).getDay();
 
-  for (let i = 0; i <= currentMonthIndex; i++) {
-    let row = document.createElement("tr");
+    let totals = {
+      movies: 87,
+      books: 0.51,
+      drawing: 0,
+      music: 0
+    };
 
-    let monthCell = document.createElement("td");
-    monthCell.textContent = months[i];
-    row.appendChild(monthCell);
+    const updateTotals = () => {
+      document.getElementById("movie-total").textContent = totals.movies.toFixed(0);
+      document.getElementById("book-total").textContent = totals.books.toFixed(2);
+      document.getElementById("draw-total").textContent = totals.drawing;
+      document.getElementById("music-total").textContent = totals.music;
+    };
 
-    let moviesCell = document.createElement("td");
-    let input = document.createElement("input");
-    input.type = "number";
-    input.min = "0";
+    // Add empty slots before first day
+    for (let i = 0; i < firstDay; i++) {
+      const empty = document.createElement("div");
+      calendar.appendChild(empty);
+    }
 
-    // Set locked values for Jan, Feb, and March
-    if (months[i] === "January") {
-      input.value = "18";
-      input.readOnly = true;
-    } else if (months[i] === "February") {
-      input.value = "18";
-      input.readOnly = true;
-    } else if (months[i] === "March") {
-      input.value = "22";
-      input.readOnly = true;
-    } else {
-      input.value = localStorage.getItem(months[i]) || "0";
-      input.addEventListener("input", updateSummary);
-      input.addEventListener("change", function() {
-        localStorage.setItem(months[i], input.value);
+    for (let d = 1; d <= daysInMonth; d++) {
+      const date = new Date(year, month, d);
+      const dayDiv = document.createElement("div");
+      dayDiv.classList.add("day");
+
+      const isFuture = date > today;
+      if (isFuture) dayDiv.classList.add("future");
+      else dayDiv.classList.add("editable");
+
+      const dayNum = document.createElement("div");
+      dayNum.className = "day-number";
+      dayNum.textContent = d;
+      dayDiv.appendChild(dayNum);
+
+      const inputs = document.createElement("div");
+      inputs.className = "inputs";
+
+      // Inputs
+      const movieInput = document.createElement("input");
+      movieInput.type = "number";
+      movieInput.min = 0;
+      movieInput.disabled = isFuture;
+      movieInput.addEventListener("input", () => {
+        recalcTotals();
       });
-    }
 
-    moviesCell.appendChild(input);
-    row.appendChild(moviesCell);
-
-    tableBody.appendChild(row);
-  }
-  updateSummary();
-}
-
-    function updateSummary() {
-      let totalWatched = 0;
-      document.querySelectorAll("tbody input").forEach(input => {
-        totalWatched += parseInt(input.value) || 0;
+      const bookInput = document.createElement("input");
+      bookInput.type = "number";
+      bookInput.min = 0;
+      bookInput.disabled = isFuture;
+      bookInput.addEventListener("input", () => {
+        recalcTotals();
       });
 
-      let minExpected = currentMonthIndex * goalPerMonth;
-      let expectedTotal = (currentMonthIndex + 1) * goalPerMonth;
-      let moviesDifference = expectedTotal - totalWatched;
-      let daysLeft = new Date(new Date().getFullYear(), currentMonthIndex + 1, 0).getDate() - new Date().getDate();
-      let moviesPerDay = (moviesDifference > 0 && daysLeft > 0) ? (moviesDifference / daysLeft).toFixed(2) : 0;
+      const drawInput = document.createElement("input");
+      drawInput.type = "checkbox";
+      drawInput.disabled = isFuture;
+      drawInput.addEventListener("change", () => {
+        recalcTotals();
+      });
 
-      // Update lower summary values
-      document.getElementById("totalNumber").textContent = totalWatched;
-      // For MOVIES LEFT, show a positive value only when behind goal (else 0)
-      let moviesLeft = moviesDifference > 0 ? moviesDifference : 0;
-      document.getElementById("moviesLeftNumber").textContent = moviesLeft;
-      document.getElementById("moviesPerDayNumber").textContent = moviesPerDay;
+      const musicInput = document.createElement("input");
+      musicInput.type = "checkbox";
+      musicInput.disabled = isFuture;
+      musicInput.addEventListener("change", () => {
+        recalcTotals();
+      });
 
-      updateProgressBar(totalWatched, minExpected, expectedTotal);
+      inputs.appendChild(movieInput);
+      inputs.appendChild(bookInput);
+      inputs.appendChild(drawInput);
+      inputs.appendChild(musicInput);
+
+      dayDiv.appendChild(inputs);
+      calendar.appendChild(dayDiv);
     }
 
-    function updateProgressBar(watched, minGoal, maxGoal) {
-      let progress = Math.min((watched / maxGoal) * 100, 100);
-      let progressBar = document.getElementById("progressBar");
-      progressBar.style.width = progress + "%";
+    function recalcTotals() {
+      let movieSum = 0;
+      let bookSum = 0;
+      let drawCount = 0;
+      let musicCount = 0;
 
-      if (watched < minGoal) {
-        progressBar.style.backgroundColor = "#D61F1F";
-      } else if (watched >= minGoal && watched < maxGoal) {
-        progressBar.style.backgroundColor = "#FFD301";
-      } else {
-        progressBar.style.backgroundColor = "#006B3D";
-      }
+      const dayDivs = calendar.querySelectorAll(".day.editable, .day.future");
+      dayDivs.forEach(dayDiv => {
+        const inputs = dayDiv.querySelectorAll("input");
+        if (inputs.length === 4) {
+          movieSum += parseFloat(inputs[0].value) || 0;
+          bookSum += parseFloat(inputs[1].value) || 0;
+          if (inputs[2].checked) drawCount++;
+          if (inputs[3].checked) musicCount++;
+        }
+      });
+
+      totals.movies = 87 + movieSum;
+      totals.books = 0.51 + bookSum;
+      totals.drawing = drawCount;
+      totals.music = musicCount;
+
+      updateTotals();
+      saveData();
     }
 
-    createTable();
+    // Persist data locally
+    function saveData() {
+      const data = [];
+      calendar.querySelectorAll(".day").forEach(dayDiv => {
+        const inputs = dayDiv.querySelectorAll("input");
+        if (inputs.length === 4) {
+          data.push({
+            movies: inputs[0].value || "",
+            books: inputs[1].value || "",
+            drawing: inputs[2].checked,
+            music: inputs[3].checked
+          });
+        } else {
+          data.push(null);
+        }
+      });
+      localStorage.setItem("julyHobbyTrackerData", JSON.stringify(data));
+    }
+
+    function loadData() {
+      const data = JSON.parse(localStorage.getItem("julyHobbyTrackerData") || "[]");
+      if (!data.length) return;
+      let index = 0;
+      calendar.querySelectorAll(".day").forEach(dayDiv => {
+        const inputs = dayDiv.querySelectorAll("input");
+        if (inputs.length === 4 && data[index]) {
+          inputs[0].value = data[index].movies;
+          inputs[1].value = data[index].books;
+          inputs[2].checked = data[index].drawing;
+          inputs[3].checked = data[index].music;
+          index++;
+        }
+      });
+      recalcTotals();
+    }
+
+    loadData();
   </script>
-
 </body>
 </html>
