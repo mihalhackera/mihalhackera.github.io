@@ -1,157 +1,155 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>July Hobby Tracker</title>
-  <style>
-    :root {
-      --bg: #000;
-      --text: #fff;
-      --faint-emoji: rgba(255, 255, 255, 0.07);
-    }
+<meta charset="UTF-8" />
+<title>July Hobby Tracker</title>
+<style>
+  :root {
+    --bg: #000;
+    --text: #fff;
+  }
 
-    html, body {
-      height: 100%;
-      width: 100%;
-      margin: 0;
-      padding: 0;
-    }
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    width: 100vw;
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: sans-serif;
+    display: flex;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
 
-    * {
-      box-sizing: border-box;
-      font-family: sans-serif;
-    }
+  body {
+    padding: 1rem;
+    gap: 1.5rem;
+  }
 
-    body {
-      background-color: var(--bg);
-      color: var(--text);
-      display: flex;
-      padding: 2rem;
-      gap: 3rem;
-      height: 100vh;
-      width: 100vw;
-      box-sizing: border-box;
-    }
+  .calendar {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    max-width: 75vw;
+    max-height: 100%;
+  }
 
-    .calendar {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      flex-grow: 1;
-      max-width: 75vw;
-    }
+  .month-label {
+    font-weight: bold;
+    /* clamp(min, preferred, max) */
+    font-size: clamp(2rem, 5vw, 4rem);
+    margin-bottom: 0.5rem;
+  }
 
-    .month-label {
-      font-size: 3.5rem;
-      font-weight: bold;
-    }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.8rem;
+    /* make grid height max possible but prevent overflow */
+    max-height: calc(100vh - 6rem);
+  }
 
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 1rem;
-      height: calc(100vh - 7rem);
-    }
+  .day {
+    aspect-ratio: 1 / 1;
+    border: 2px solid var(--text);
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem;
+    justify-content: space-between;
+    position: relative;
+    transition: transform 0.2s ease;
+    cursor: default;
+    color: var(--text);
+  }
 
-    .day {
-      aspect-ratio: 1 / 1;
-      border: 2px solid var(--text);
-      border-radius: 6px;
-      display: flex;
-      flex-direction: column;
-      padding: 0.5rem;
-      justify-content: space-between;
-      position: relative;
-      transition: transform 0.2s ease;
-      cursor: default;
-      font-size: 1.2rem;
-    }
+  .day.future {
+    color: grey;
+    border-color: grey;
+  }
 
-    .day.future {
-      color: grey;
-      border-color: grey;
-    }
+  .day.editable {
+    cursor: text;
+  }
 
-    .day.editable {
-      cursor: text;
-    }
+  .day.editable:hover {
+    transform: scale(1.05);
+    z-index: 10;
+  }
 
-    .day.editable:hover {
-      transform: scale(1.05);
-      z-index: 10;
-    }
+  .day-number {
+    font-weight: bold;
+    position: relative;
+    /* scale font relative to box */
+    font-size: clamp(1rem, 3vw, 1.8rem);
+  }
 
-    .day-number {
-      font-weight: bold;
-      z-index: 2;
-      position: relative;
-    }
+  .inputs {
+    flex-grow: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    align-items: center;
+    justify-items: center;
+    gap: 0.2rem;
+  }
 
-    .inputs {
-      flex-grow: 1;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      grid-template-rows: 1fr 1fr;
-      align-items: center;
-      justify-items: center;
-      gap: 0.2rem;
-      position: relative;
-      z-index: 2;
-    }
+  .inputs input[type="number"] {
+    width: 1.6rem;
+    border: none;
+    border-bottom: 1px solid var(--text);
+    background: transparent;
+    text-align: center;
+    color: var(--text);
+    font-size: clamp(1rem, 2.5vw, 1.5rem);
+    outline-offset: 2px;
+    -moz-appearance: textfield;
+  }
 
-    .inputs input[type="number"] {
-      width: 1.5rem;
-      border: none;
-      border-bottom: 1px solid var(--text);
-      background: transparent;
-      text-align: center;
-      color: var(--text);
-      font-size: 1.1rem;
-      outline-offset: 2px;
-      -moz-appearance: textfield;
-    }
+  .inputs input[type=number]::-webkit-inner-spin-button, 
+  .inputs input[type=number]::-webkit-outer-spin-button { 
+    -webkit-appearance: none; 
+    margin: 0; 
+  }
 
-    .inputs input[type=number]::-webkit-inner-spin-button, 
-    .inputs input[type=number]::-webkit-outer-spin-button { 
-      -webkit-appearance: none; 
-      margin: 0; 
-    }
+  .inputs input[type="checkbox"] {
+    appearance: none;
+    width: 1.5rem;
+    height: 1.5rem;
+    border: 1px solid var(--text);
+    background: transparent;
+    border-radius: 2px;
+    position: relative;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
 
-    .inputs input[type="checkbox"] {
-      appearance: none;
-      width: 1.3rem;
-      height: 1.3rem;
-      border: 1px solid var(--text);
-      background: transparent;
-      border-radius: 2px;
-      position: relative;
-      cursor: pointer;
-      transition: background-color 0.2s ease;
-    }
+  .inputs input[type="checkbox"]:checked::after {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 5px;
+    width: 5px;
+    height: 9px;
+    border: solid var(--text);
+    border-width: 0 1.5px 1.5px 0;
+    transform: rotate(45deg);
+  }
 
-    .inputs input[type="checkbox"]:checked::after {
-      content: "";
-      position: absolute;
-      top: 2px;
-      left: 5px;
-      width: 5px;
-      height: 9px;
-      border: solid var(--text);
-      border-width: 0 1.5px 1.5px 0;
-      transform: rotate(45deg);
-    }
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+    justify-content: center;
+    font-size: clamp(1.5rem, 3vw, 3rem);
+    font-weight: bold;
+    width: 25vw;
+    min-width: 250px;
+    max-height: 100vh;
+  }
 
-    .sidebar {
-      display: flex;
-      flex-direction: column;
-      gap: 3rem;
-      justify-content: center;
-      font-size: 2.5rem;
-      font-weight: bold;
-      width: 25vw;
-      min-width: 250px;
-    }
-  </style>
+</style>
 </head>
 <body>
   <div class="calendar">
@@ -165,144 +163,144 @@
     <div><span id="music-total">0</span> days music practiced</div>
   </div>
 
-  <script>
-    const calendar = document.getElementById("calendar");
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = 6; // July (0-based)
+<script>
+  const calendar = document.getElementById("calendar");
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = 6; // July (0-based)
 
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const firstDay = new Date(year, month, 1).getDay();
 
-    let totals = {
-      movies: 87,
-      books: 0.51,
-      drawing: 0,
-      music: 0
-    };
+  let totals = {
+    movies: 87,
+    books: 0.51,
+    drawing: 0,
+    music: 0
+  };
 
-    const updateTotals = () => {
-      document.getElementById("movie-total").textContent = totals.movies.toFixed(0);
-      document.getElementById("book-total").textContent = totals.books.toFixed(2);
-      document.getElementById("draw-total").textContent = totals.drawing;
-      document.getElementById("music-total").textContent = totals.music;
-    };
+  const updateTotals = () => {
+    document.getElementById("movie-total").textContent = totals.movies.toFixed(0);
+    document.getElementById("book-total").textContent = totals.books.toFixed(2);
+    document.getElementById("draw-total").textContent = totals.drawing;
+    document.getElementById("music-total").textContent = totals.music;
+  };
 
-    for (let i = 0; i < firstDay; i++) {
-      const empty = document.createElement("div");
-      calendar.appendChild(empty);
-    }
+  for (let i = 0; i < firstDay; i++) {
+    const empty = document.createElement("div");
+    calendar.appendChild(empty);
+  }
 
-    for (let d = 1; d <= daysInMonth; d++) {
-      const date = new Date(year, month, d);
-      const dayDiv = document.createElement("div");
-      dayDiv.classList.add("day");
+  for (let d = 1; d <= daysInMonth; d++) {
+    const date = new Date(year, month, d);
+    const dayDiv = document.createElement("div");
+    dayDiv.classList.add("day");
 
-      const isFuture = date > today;
-      if (isFuture) dayDiv.classList.add("future");
-      else dayDiv.classList.add("editable");
+    const isFuture = date > today;
+    if (isFuture) dayDiv.classList.add("future");
+    else dayDiv.classList.add("editable");
 
-      const dayNum = document.createElement("div");
-      dayNum.className = "day-number";
-      dayNum.textContent = d;
-      dayDiv.appendChild(dayNum);
+    const dayNum = document.createElement("div");
+    dayNum.className = "day-number";
+    dayNum.textContent = d;
+    dayDiv.appendChild(dayNum);
 
-      const inputs = document.createElement("div");
-      inputs.className = "inputs";
+    const inputs = document.createElement("div");
+    inputs.className = "inputs";
 
-      const movieInput = document.createElement("input");
-      movieInput.type = "number";
-      movieInput.min = 0;
-      movieInput.disabled = isFuture;
-      movieInput.addEventListener("input", recalcTotals);
+    const movieInput = document.createElement("input");
+    movieInput.type = "number";
+    movieInput.min = 0;
+    movieInput.disabled = isFuture;
+    movieInput.addEventListener("input", recalcTotals);
 
-      const bookInput = document.createElement("input");
-      bookInput.type = "number";
-      bookInput.min = 0;
-      bookInput.disabled = isFuture;
-      bookInput.addEventListener("input", recalcTotals);
+    const bookInput = document.createElement("input");
+    bookInput.type = "number";
+    bookInput.min = 0;
+    bookInput.disabled = isFuture;
+    bookInput.addEventListener("input", recalcTotals);
 
-      const drawInput = document.createElement("input");
-      drawInput.type = "checkbox";
-      drawInput.disabled = isFuture;
-      drawInput.addEventListener("change", recalcTotals);
+    const drawInput = document.createElement("input");
+    drawInput.type = "checkbox";
+    drawInput.disabled = isFuture;
+    drawInput.addEventListener("change", recalcTotals);
 
-      const musicInput = document.createElement("input");
-      musicInput.type = "checkbox";
-      musicInput.disabled = isFuture;
-      musicInput.addEventListener("change", recalcTotals);
+    const musicInput = document.createElement("input");
+    musicInput.type = "checkbox";
+    musicInput.disabled = isFuture;
+    musicInput.addEventListener("change", recalcTotals);
 
-      inputs.appendChild(movieInput);
-      inputs.appendChild(bookInput);
-      inputs.appendChild(drawInput);
-      inputs.appendChild(musicInput);
+    inputs.appendChild(movieInput);
+    inputs.appendChild(bookInput);
+    inputs.appendChild(drawInput);
+    inputs.appendChild(musicInput);
 
-      dayDiv.appendChild(inputs);
-      calendar.appendChild(dayDiv);
-    }
+    dayDiv.appendChild(inputs);
+    calendar.appendChild(dayDiv);
+  }
 
-    function recalcTotals() {
-      let movieSum = 0;
-      let bookSum = 0;
-      let drawCount = 0;
-      let musicCount = 0;
+  function recalcTotals() {
+    let movieSum = 0;
+    let bookSum = 0;
+    let drawCount = 0;
+    let musicCount = 0;
 
-      const dayDivs = calendar.querySelectorAll(".day.editable, .day.future");
-      dayDivs.forEach(dayDiv => {
-        const inputs = dayDiv.querySelectorAll("input");
-        if (inputs.length === 4) {
-          movieSum += parseFloat(inputs[0].value) || 0;
-          bookSum += parseFloat(inputs[1].value) || 0;
-          if (inputs[2].checked) drawCount++;
-          if (inputs[3].checked) musicCount++;
-        }
-      });
+    const dayDivs = calendar.querySelectorAll(".day.editable, .day.future");
+    dayDivs.forEach(dayDiv => {
+      const inputs = dayDiv.querySelectorAll("input");
+      if (inputs.length === 4) {
+        movieSum += parseFloat(inputs[0].value) || 0;
+        bookSum += parseFloat(inputs[1].value) || 0;
+        if (inputs[2].checked) drawCount++;
+        if (inputs[3].checked) musicCount++;
+      }
+    });
 
-      totals.movies = 87 + movieSum;
-      totals.books = 0.51 + bookSum;
-      totals.drawing = drawCount;
-      totals.music = musicCount;
+    totals.movies = 87 + movieSum;
+    totals.books = 0.51 + bookSum;
+    totals.drawing = drawCount;
+    totals.music = musicCount;
 
-      updateTotals();
-      saveData();
-    }
+    updateTotals();
+    saveData();
+  }
 
-    function saveData() {
-      const data = [];
-      calendar.querySelectorAll(".day").forEach(dayDiv => {
-        const inputs = dayDiv.querySelectorAll("input");
-        if (inputs.length === 4) {
-          data.push({
-            movies: inputs[0].value || "",
-            books: inputs[1].value || "",
-            drawing: inputs[2].checked,
-            music: inputs[3].checked
-          });
-        } else {
-          data.push(null);
-        }
-      });
-      localStorage.setItem("julyHobbyTrackerData", JSON.stringify(data));
-    }
+  function saveData() {
+    const data = [];
+    calendar.querySelectorAll(".day").forEach(dayDiv => {
+      const inputs = dayDiv.querySelectorAll("input");
+      if (inputs.length === 4) {
+        data.push({
+          movies: inputs[0].value || "",
+          books: inputs[1].value || "",
+          drawing: inputs[2].checked,
+          music: inputs[3].checked
+        });
+      } else {
+        data.push(null);
+      }
+    });
+    localStorage.setItem("julyHobbyTrackerData", JSON.stringify(data));
+  }
 
-    function loadData() {
-      const data = JSON.parse(localStorage.getItem("julyHobbyTrackerData") || "[]");
-      if (!data.length) return;
-      let index = 0;
-      calendar.querySelectorAll(".day").forEach(dayDiv => {
-        const inputs = dayDiv.querySelectorAll("input");
-        if (inputs.length === 4 && data[index]) {
-          inputs[0].value = data[index].movies;
-          inputs[1].value = data[index].books;
-          inputs[2].checked = data[index].drawing;
-          inputs[3].checked = data[index].music;
-        }
-        index++;
-      });
-      recalcTotals();
-    }
+  function loadData() {
+    const data = JSON.parse(localStorage.getItem("julyHobbyTrackerData") || "[]");
+    if (!data.length) return;
+    let index = 0;
+    calendar.querySelectorAll(".day").forEach(dayDiv => {
+      const inputs = dayDiv.querySelectorAll("input");
+      if (inputs.length === 4 && data[index]) {
+        inputs[0].value = data[index].movies;
+        inputs[1].value = data[index].books;
+        inputs[2].checked = data[index].drawing;
+        inputs[3].checked = data[index].music;
+      }
+      index++;
+    });
+    recalcTotals();
+  }
 
-    loadData();
-  </script>
+  loadData();
+</script>
 </body>
 </html>
